@@ -27,9 +27,11 @@ For the sake of completeness, despite this not being the topic of this book, her
 
 ![MVVW illustration](../images/mvvw.png "MVVM Illustration")
 
-##1.2 First example
+##1.2 First example - outputting model properties in the view
 
-The first example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
+The first example shows the basic concept that outputs data from a viewmodel to a view. Please note that this is just a one-time, one-way binding here. Neither will the view update when the model properties change, nor will changes in the view reflect in the model. Binding native Javascript variables to your view outputs them only once, with the value they had at the time the `ko.applyBindings()` call was processed.
+
+Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
 
 ### View (HTML with declarative bindings)
 
