@@ -4,8 +4,7 @@ Following the wake of [Node.js] and the foundation of a giant and rapidly growin
 
 In contrast to many of the other available MVC/MVVM implementations, Knockout.js is a library that takes care of the **data-binding** between the model and the view. By oing this, it frees developers from the hassle of manually updating the DOM when data in the JS model changes, respectively vice versa, updating the JS model when the user modifies the data in the course of interaction with the web application.
 
-It also offers binding of viewmodel functionality to events, and last but not least, [templating]. v3.2.0 introduced [Knockout components]
-
+It also offers binding of viewmodel functionality to events, and last but not least, [templating]. v3.2.0 introduced [Knockout components].
 
 Knockout was developed and is maintained as an open source project by Steve Sanderson, a Microsoft employee. Despite this fact Knockout never was and never will be a Microsoft product, and is release under the [MIT License].
 
@@ -25,11 +24,11 @@ For the sake of completeness, despite this not being the topic of this book, her
 
 ><http://willcodeforcoffee.com/2013/06/12/what-is-mvc-vs-mvvm-pattern/>
 
-![MVVW illustration](./images/mvvw.png "MVVM Illustration")
+![MVVW illustration](../images/mvvw.png "MVVM Illustration")
 
 ##1.2 First example
 
-The first example shows the basic concept that ties data from a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
+The first example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
 
 ### View (HTML with declarative bindings)
 
@@ -49,7 +48,7 @@ The first example shows the basic concept that ties data from a viewmodel to a v
 </html>
 ```
 
-### Viewmodel containing the data
+### Viewmodel containing the data (vanilla Javascript)
 ```javascript
 var ExampleViewModel = function() {
 	var self = this; // Store a stable reference to this
