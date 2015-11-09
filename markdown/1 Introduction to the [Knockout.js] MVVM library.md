@@ -245,7 +245,7 @@ The fourth example shows a webmail client with hash-based or pushState navigatio
 </html>
 ```
 
-### Viewmodel containing the data
+### Viewmodel
 ```javascript
 function WebmailViewModel() {
   // Data
@@ -332,7 +332,7 @@ The fifth example shows how to implement a custom widget (poll / rating). Find t
 </html>
 ```
 
-### Viewmodel containing the data
+### Viewmodel
 ```javascript
 // ----------------------------------------------------------------------------
 // Reusable bindings - ideally kept in a separate file
@@ -393,6 +393,99 @@ ko.applyBindings(new SurveyViewModel("Which factors affect your technology choic
   "Number of gradients/dropshadows on project homepage",
   "Totally believable testimonials on project homepage"
 ]));
+```
+
+##1.7 Loading and saving data
+
+The sixth example shows how to load and save date. Find the snippets (first step) in Codepen.io here: <http://codepen.io/DirtyHerby/pen/XmxGXj>
+
+### View
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="path/to/jquery.js"></script>
+		<script src="path/to/knockout.js"></script>
+	</head>
+	<body>
+	
+	<h3>Tasks</h3>
+
+	  <form data-bind="submit: addTask">
+	    Add task:
+	    <input data-bind="value: newTaskText" placeholder="What needs to be done?" />
+	    <button type="submit">Add</button>
+	  </form>
+	
+	  <ul data-bind="foreach: tasks, visible: tasks().length > 0">
+	    <li>
+	      <input type="checkbox" data-bind="checked: isDone" />
+	      <input data-bind="value: title, disable: isDone" />
+	      <a href="#" data-bind="click: $parent.removeTask">Delete</a>
+	    </li>
+	  </ul>
+	
+	  You have <b data-bind="text: incompleteTasks().length">&nbsp;</b> incomplete task(s)
+	  <span data-bind="visible: incompleteTasks().length == 0"> - it's beer time!</span>
+	
+	  <button data-bind="click: save">Save</button>
+  
+	</body>
+</html>
+```
+
+### Viewmodel
+```javascript
+function Task(data) {
+  this.title = ko.observable(data.title);
+  this.isDone = ko.observable(data.isDone);
+}
+
+function TaskListViewModel() {
+  // Data
+  var self = this;
+  self.tasks = ko.observableArray([]);
+  self.newTaskText = ko.observable();
+  self.incompleteTasks = ko.computed(function() {
+    return ko.utils.arrayFilter(self.tasks(), function(task) {
+      return !task.isDone() && !task._destroy
+    });
+  });
+
+  // Operations
+  self.addTask = function() {
+    self.tasks.push(new Task({
+      title: this.newTaskText()
+    }));
+    self.newTaskText("");
+  };
+  self.removeTask = function(task) {
+    self.tasks.destroy(task)
+  };
+  self.save = function() {
+    $.ajax("/tasks", {
+      data: ko.toJSON({
+        tasks: self.tasks
+      }),
+      type: "post",
+      contentType: "application/json",
+      success: function(result) {
+        alert(result)
+      }
+    });
+  };
+
+  // Load initial state from server, convert it to Task instances, then populate self.tasks
+  $.getJSON("/tasks", function(allData) {
+    var mappedTasks = $.map(allData, function(item) {
+      return new Task(item)
+    });
+    self.tasks(mappedTasks);
+  });
+}
+
+ko.applyBindings(new TaskListViewModel());
 ```
 
 [Knockout.js]: http://www.knockoutjs.com
