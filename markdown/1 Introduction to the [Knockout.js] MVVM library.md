@@ -70,7 +70,7 @@ ko.applyBindings(new ExampleViewModel()); // This is where all the magic happens
 
 The second example shows observable and computed properties for a dynamic view. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/epPbRr>
 
-### View (HTML with declarative bindings)
+### View
 
 ```html
 <p>My first name is <input data-bind="value: firstName"></span>.</p>
@@ -82,7 +82,7 @@ The second example shows observable and computed properties for a dynamic view. 
 <p>My full name is <span data-bind="text: fullName()"></span>.</p>
 ```
 
-### Viewmodel containing the data
+### Viewmodel
 ```javascript
 self.firstName = ko.observable("Peter");
 self.lastName = ko.observable("Miller");
@@ -95,7 +95,7 @@ self.fullName = ko.computed(function() {
 
 The third example shows lists and collections for generate repeating blocks of UI elements by using observable arrays and the foreach binding. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/gaBqMx>
 
-### View (HTML with declarative bindings)
+### View
 
 ```html
 <h2>Your seat reservations (<span data-bind="text: seats().length"></span>)</h2>
@@ -130,7 +130,7 @@ The third example shows lists and collections for generate repeating blocks of U
 </h3>
 ```
 
-### Viewmodel containing the data
+### Viewmodel
 ```javascript
 // Class to represent a row in the seat reservations grid
 function SeatReservation(name, initialMeal) {
@@ -183,7 +183,111 @@ function ReservationsViewModel() {
   }
 }
 
-ko.applyBindings(new ReservationsViewModel()); // This is where all the magic happens
+ko.applyBindings(new ReservationsViewModel());
+```
+
+##1.5 Single page applications
+
+The fourth example shows a webmail client with hash-based or pushState navigation. Find the snippets (first step) in Codepen.io here: <http://codepen.io/DirtyHerby/pen/bVmzaj>. A standalone finished copy you can find here: <http://learn.knockoutjs.com/WebmailExampleStandalone.html>
+
+### View
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="path/to/knockout.js"></script>
+		<script src="path/to/sammy.js"></script>
+	</head>
+	<body>
+	
+	<!-- Folders -->
+	  <ul class="folders" data-bind="foreach: folders">
+	    <li data-bind="text: $data, 
+	                   css: { selected: $data == $root.chosenFolderId() },
+	                   click: $root.goToFolder"></li>
+	  </ul>
+	
+	  <!-- Mails grid -->
+	  <table class="mails" data-bind="with: chosenFolderData">
+	    <thead>
+	      <tr>
+	        <th>From</th>
+	        <th>To</th>
+	        <th>Subject</th>
+	        <th>Date</th>
+	      </tr>
+	    </thead>
+	    <tbody data-bind="foreach: mails">
+	      <tr data-bind="click: $root.goToMail">
+	        <td data-bind="text: from"></td>
+	        <td data-bind="text: to"></td>
+	        <td data-bind="text: subject"></td>
+	        <td data-bind="text: date"></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	
+	  <!-- Chosen mail -->
+	  <div class="viewMail" data-bind="with: chosenMailData">
+	    <div class="mailInfo">
+	      <h1 data-bind="text: subject"></h1>
+	      <p>
+	        <label>From</label>: <span data-bind="text: from"></span></p>
+	      <p>
+	        <label>To</label>: <span data-bind="text: to"></span></p>
+	      <p>
+	        <label>Date</label>: <span data-bind="text: date"></span></p>
+	    </div>
+	    <p class="message" data-bind="html: messageContent" />
+	  </div>
+	</body>
+</html>
+```
+
+### Viewmodel containing the data
+```javascript
+function WebmailViewModel() {
+  // Data
+  var self = this;
+  self.folders = ['Inbox', 'Archive', 'Sent', 'Spam'];
+  self.chosenFolderId = ko.observable();
+  self.chosenFolderData = ko.observable();
+  self.chosenMailData = ko.observable();
+
+  // Behaviours    
+  self.goToFolder = function(folder) {
+    location.hash = folder
+  };
+  self.goToMail = function(mail) {
+    location.hash = mail.folder + '/' + mail.id
+  };
+
+  // Client-side routes    
+  Sammy(function() {
+    this.get('#:folder', function() {
+      self.chosenFolderId(this.params.folder);
+      self.chosenMailData(null);
+      $.get("/mail", {
+        folder: this.params.folder
+      }, self.chosenFolderData);
+    });
+
+    this.get('#:folder/:mailId', function() {
+      self.chosenFolderId(this.params.folder);
+      self.chosenFolderData(null);
+      $.get("/mail", {
+        mailId: this.params.mailId
+      }, self.chosenMailData);
+    });
+
+    this.get('', function() {
+      this.app.runRoute('get', '#Inbox')
+    });
+  }).run();
+};
+
+ko.applyBindings(new WebmailViewModel());
 ```
 
 [Knockout.js]: http://www.knockoutjs.com
