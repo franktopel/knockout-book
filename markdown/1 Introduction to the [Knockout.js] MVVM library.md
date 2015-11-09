@@ -68,7 +68,7 @@ ko.applyBindings(new ExampleViewModel()); // This is where all the magic happens
 
 ##1.3 Observable and computed values
 
-The second example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
+The second example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/epPbRr>
 
 ### View (HTML with declarative bindings)
 
