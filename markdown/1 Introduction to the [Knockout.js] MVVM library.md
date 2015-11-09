@@ -140,7 +140,7 @@ function UserReservation(name, initialEdition) {
 
   self.formattedPrice = ko.computed(function() {
     var price = self.edition().price;
-    return price ? price.toFixed(2) + "€" : "None";
+    return price ? price.toFixed(2) + "€" : "free";
   });
 }
 
@@ -154,10 +154,10 @@ function ReservationsViewModel() {
     price: 0
   }, {
     editionName: "Premium Edition",
-    price: 34.95
+    price: 29.95
   }, {
     editionName: "Ultimate Edition",
-    price: 290
+    price: 49.95
   }];
 
   // Editable data
