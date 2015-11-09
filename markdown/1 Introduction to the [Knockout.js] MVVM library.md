@@ -98,48 +98,48 @@ The third example shows lists and collections for generate repeating blocks of U
 ### View
 
 ```html
-<h2>Your seat reservations (<span data-bind="text: seats().length"></span>)</h2>
+<h2>License overview (<span data-bind="text: users().length"></span>)</h2>
 
 <table>
-	<thead>
-		<tr>
-			<th>Passenger name</th>
-			<th>Meal</th>
-			<th>Surcharge</th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody data-bind="foreach: seats">
-		<tr>
-			<td>
-				<input data-bind="value: name" />
-			</td>
-			<td>
-				<select data-bind="options: $root.availableMeals, value: meal, optionsText: 'mealName'"></select>
-			</td>
-			<td data-bind="text: formattedPrice"></td>
-			<td><a href="#" data-bind="click: $root.removeSeat">Remove</a></td>
-		</tr>
-	</tbody>
+  <thead>
+    <tr>
+      <th>User name</th>
+      <th>Edition</th>
+      <th>Surcharge</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody data-bind="foreach: users">
+    <tr>
+      <td>
+        <input data-bind="value: name" />
+      </td>
+      <td>
+        <select data-bind="options: $root.availableEditions, value: edition, optionsText: 'editionName'"></select>
+      </td>
+      <td data-bind="text: formattedPrice"></td>
+      <td><a href="#" data-bind="click: $root.removeUser">Remove</a></td>
+    </tr>
+  </tbody>
 </table>
 
-<button data-bind="click: addSeat, enable: seats().length < 5">Reserve another seat</button>
+<button data-bind="click: addUser, enable: users().length < 5">Add user</button>
 
 <h3 data-bind="visible: totalSurcharge() > 0">
-	Total surcharge: <span data-bind="text: totalSurcharge().toFixed(2)"></span>€
+    Total surcharge: <span data-bind="text: totalSurcharge().toFixed(2)"></span>€
 </h3>
 ```
 
 ### Viewmodel
 ```javascript
-// Class to represent a row in the seat reservations grid
-function SeatReservation(name, initialMeal) {
+// Class to represent a row in the user reservations grid
+function UserReservation(name, initialEdition) {
   var self = this;
   self.name = name;
-  self.meal = ko.observable(initialMeal);
+  self.edition = ko.observable(initialEdition);
 
   self.formattedPrice = ko.computed(function() {
-    var price = self.meal().price;
+    var price = self.edition().price;
     return price ? price.toFixed(2) + "€" : "None";
   });
 }
@@ -149,37 +149,37 @@ function ReservationsViewModel() {
   var self = this;
 
   // Non-editable catalog data - would come from the server
-  self.availableMeals = [{
-    mealName: "Standard (sandwich)",
+  self.availableEditions = [{
+    editionName: "Standard Edition",
     price: 0
   }, {
-    mealName: "Premium (lobster)",
+    editionName: "Premium Edition",
     price: 34.95
   }, {
-    mealName: "Ultimate (whole zebra)",
+    editionName: "Ultimate Edition",
     price: 290
   }];
 
   // Editable data
-  self.seats = ko.observableArray([
-    new SeatReservation("Peter", self.availableMeals[0]),
-    new SeatReservation("John", self.availableMeals[0])
+  self.users = ko.observableArray([
+    new UserReservation("Peter", self.availableEditions[0]),
+    new UserReservation("John", self.availableEditions[0])
   ]);
 
   // Computed data
   self.totalSurcharge = ko.computed(function() {
     var total = 0;
-    for (var i = 0; i < self.seats().length; i++)
-      total += self.seats()[i].meal().price;
+    for (var i = 0; i < self.users().length; i++)
+      total += self.users()[i].edition().price;
     return total;
   });
 
   // Operations
-  self.addSeat = function() {
-    self.seats.push(new SeatReservation("", self.availableMeals[0]));
+  self.addUser = function() {
+    self.users.push(new UserReservation("", self.availableEditions[0]));
   }
-  self.removeSeat = function(seat) {
-    self.seats.remove(seat)
+  self.removeUser = function(user) {
+    self.users.remove(user)
   }
 }
 
