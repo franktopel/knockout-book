@@ -101,7 +101,7 @@ var ExampleViewModel = function() {
 	self.lastName = ko.observable("Miller");
 	self.fullName = ko.computed(function() {
 		return self.firstName() + " " + self.lastName();
-	}, self);
+	});
 	/* END Properties */
 };
 
