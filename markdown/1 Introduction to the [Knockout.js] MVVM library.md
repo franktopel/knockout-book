@@ -68,6 +68,48 @@ var ExampleViewModel = function() {
 ko.applyBindings(new ExampleViewModel()); // This is where all the magic happens
 ```
 
+##1.3 Observable and computed values
+
+The second example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/epPbRr>
+
+### View (HTML with declarative bindings)
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="path/to/knockout.js"></script>
+	</head>
+	<body>
+		<h1>Introduction to Knockout.js</h1>
+		<p>My first name is <input data-bind="value: firstName"></span>.</p>
+		<p>My last name is <input data-bind="value: lastName"></span>.</p>
+		<hr />
+		<p>My first name is <span data-bind="text: firstName"></span>.</p>
+		<p>My last name is <span data-bind="text: lastName"></span>.</p>
+		<hr />
+		<p>My full name is <span data-bind="text: fullName()"></span>.</p>
+	</body>
+</html>
+```
+
+### Viewmodel containing the data
+```javascript
+var ExampleViewModel = function() {
+	var self = this; // Store a stable reference to this
+	
+	/* BEGIN Properties */
+	self.firstName = ko.observable("Peter");
+	self.lastName = ko.observable("Miller");
+	self.fullName = ko.computed(function() {
+		return self.firstName() + " " + self.lastName();
+	}, self);
+	/* END Properties */
+};
+
+ko.applyBindings(new ExampleViewModel()); // This is where all the magic happens
+```
+
 
 [Knockout.js]: http://www.knockoutjs.com
 [Node.js]: http://nodejs.org
