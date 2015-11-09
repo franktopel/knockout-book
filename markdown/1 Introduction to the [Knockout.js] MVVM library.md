@@ -290,6 +290,111 @@ function WebmailViewModel() {
 ko.applyBindings(new WebmailViewModel());
 ```
 
+##1.6 Creating custom bindings
+
+The fifth example shows how to implement a custom widget (poll / rating). Find the snippets (first step) in Codepen.io here: <http://codepen.io/DirtyHerby/pen/zvmeXq>
+
+### View
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="path/to/jquery.js"></script>
+		<script src="path/to/knockout.js"></script>
+	</head>
+	<body>
+	
+	<h3 data-bind="text: question"></h3>
+	  <p>Please distribute <b data-bind="text: pointsBudget"></b> points between the following options.</p>
+	
+	  <table>
+	    <thead>
+	      <tr>
+	        <th>Option</th>
+	        <th>Importance</th>
+	      </tr>
+	    </thead>
+	    <tbody data-bind="foreach: answers">
+	      <tr>
+	        <td data-bind="text: answerText"></td>
+	        <td>
+	          <select data-bind="options: [1,2,3,4,5], value: points"></select>
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+	
+	  <h3 data-bind="fadeVisible: pointsUsed() > pointsBudget">You've used too many points! Please remove some.</h3>
+	  <p>You've got <b data-bind="text: pointsBudget - pointsUsed()"></b> points left to use.</p>
+	  <button data-bind="jqButton: { enable: pointsUsed() <= pointsBudget }, click: save">Finished</button>
+	</body>
+</html>
+```
+
+### Viewmodel containing the data
+```javascript
+// ----------------------------------------------------------------------------
+// Reusable bindings - ideally kept in a separate file
+
+ko.bindingHandlers.fadeVisible = {
+  init: function(element, valueAccessor) {
+    // Start visible/invisible according to initial value
+    var shouldDisplay = valueAccessor();
+    $(element).toggle(shouldDisplay);
+  },
+  update: function(element, valueAccessor) {
+    // On update, fade in/out
+    var shouldDisplay = valueAccessor();
+    shouldDisplay ? $(element).fadeIn() : $(element).fadeOut();
+  }
+};
+
+ko.bindingHandlers.jqButton = {
+  init: function(element) {
+    $(element).button(); // Turns the element into a jQuery UI button
+  },
+  update: function(element, valueAccessor) {
+    var currentValue = valueAccessor();
+    // Here we just update the "disabled" state, but you could update other properties too
+    $(element).button("option", "disabled", currentValue.enable === false);
+  }
+};
+
+// ----------------------------------------------------------------------------
+// Page viewmodel
+
+function Answer(text) {
+  this.answerText = text;
+  this.points = ko.observable(1);
+}
+
+function SurveyViewModel(question, pointsBudget, answers) {
+  this.question = question;
+  this.pointsBudget = pointsBudget;
+  this.answers = $.map(answers, function(text) {
+    return new Answer(text)
+  });
+  this.save = function() {
+    alert('To do')
+  };
+
+  this.pointsUsed = ko.computed(function() {
+    var total = 0;
+    for (var i = 0; i < this.answers.length; i++)
+      total += this.answers[i].points();
+    return total;
+  }, this);
+}
+
+ko.applyBindings(new SurveyViewModel("Which factors affect your technology choices?", 10, [
+  "Functionality, compatibility, pricing - all that boring stuff",
+  "How often it is mentioned on Hacker News",
+  "Number of gradients/dropshadows on project homepage",
+  "Totally believable testimonials on project homepage"
+]));
+```
+
 [Knockout.js]: http://www.knockoutjs.com
 [Node.js]: http://nodejs.org
 [Model View Controller (MVC)]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
