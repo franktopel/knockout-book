@@ -2,7 +2,7 @@
 
 Following the wake of [Node.js] and the foundation of a giant and rapidly growing Javascript ecosystem, multiple implementations of the [Model View Controller (MVC)] architectural pattern have emerged. The by far simplest one of these is [Knockout.js], which makes use of a variation of MVC called [Model View Viewmodel (MVVM)]. Please *make yourself familiar with the key concepts behind MVVW* since it will greatly help you to understand how Knockout works.
 
-In contrast to many of the other available MVC/MVVM implementations, Knockout.js is a library that takes care of the **data-binding** between the model and the view. By oing this, it frees developers from the hassle of manually updating the DOM when data in the JS model changes, respectively vice versa, updating the JS model when the user modifies the data in the course of interaction with the web application.
+In contrast to many of the other available MVC/MVVM implementations, Knockout.js is a library that takes care of the **data-binding** between the model and the view. By doing this, it frees developers from the hassle of manually updating the DOM when data in the JS model changes, respectively vice versa, updating the JS model when the user modifies the data in the course of interaction with the web application.
 
 It also offers binding of viewmodel functionality to events, and last but not least, [templating]. v3.2.0 introduced [Knockout components]
 
@@ -68,7 +68,7 @@ ko.applyBindings(new ExampleViewModel()); // This is where all the magic happens
 
 ##1.3 Observable and computed values
 
-The second example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/epPbRr>
+The second example shows observable and computed properties for a dynamic view. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/epPbRr>
 
 ### View (HTML with declarative bindings)
 
