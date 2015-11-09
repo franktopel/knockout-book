@@ -27,11 +27,9 @@ For the sake of completeness, despite this not being the topic of this book, her
 
 ![MVVW illustration](../images/mvvw.png "MVVM Illustration")
 
-##1.2 First example - outputting model properties in the view
+##1.2 First example
 
-The first example shows the basic concept that outputs data from a viewmodel to a view. Please note that this is just a one-time, one-way binding here. Neither will the view update when the model properties change, nor will changes in the view reflect in the model. Binding native Javascript variables to your view outputs them only once, with the value they had at the time the `ko.applyBindings()` call was processed.
-
-Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
+The first example shows the basic concept that ties a viewmodel to a view. Find the snippets in Codepen.io here: <http://codepen.io/connexo/pen/wKYpLP>
 
 ### View (HTML with declarative bindings)
 
@@ -75,41 +73,118 @@ The second example shows observable and computed properties for a dynamic view. 
 ### View (HTML with declarative bindings)
 
 ```html
-<!DOCTYPE html>
-<html>
-	<head>
-		<script src="path/to/knockout.js"></script>
-	</head>
-	<body>
-		<h1>Introduction to Knockout.js</h1>
-		<p>My first name is <input data-bind="value: firstName"></span>.</p>
-		<p>My last name is <input data-bind="value: lastName"></span>.</p>
-		<hr />
-		<p>My first name is <span data-bind="text: firstName"></span>.</p>
-		<p>My last name is <span data-bind="text: lastName"></span>.</p>
-		<hr />
-		<p>My full name is <span data-bind="text: fullName()"></span>.</p>
-	</body>
-</html>
+<p>My first name is <input data-bind="value: firstName"></span>.</p>
+<p>My last name is <input data-bind="value: lastName"></span>.</p>
+<hr />
+<p>My first name is <span data-bind="text: firstName"></span>.</p>
+<p>My last name is <span data-bind="text: lastName"></span>.</p>
+<hr />
+<p>My full name is <span data-bind="text: fullName()"></span>.</p>
 ```
 
 ### Viewmodel containing the data
 ```javascript
-var ExampleViewModel = function() {
-	var self = this; // Store a stable reference to this
-	
-	/* BEGIN Properties */
-	self.firstName = ko.observable("Peter");
-	self.lastName = ko.observable("Miller");
-	self.fullName = ko.computed(function() {
-		return self.firstName() + " " + self.lastName();
-	});
-	/* END Properties */
-};
-
-ko.applyBindings(new ExampleViewModel()); // This is where all the magic happens
+self.firstName = ko.observable("Peter");
+self.lastName = ko.observable("Miller");
+self.fullName = ko.computed(function() {
+	return self.firstName() + " " + self.lastName();
+});
 ```
 
+##1.4 Lists and Collections
+
+The third example shows lists and collections for generate repeating blocks of UI elements by using observable arrays and the foreach binding. Find the snippets in Codepen.io here: <http://codepen.io/DirtyHerby/pen/gaBqMx>
+
+### View (HTML with declarative bindings)
+
+```html
+<h2>Your seat reservations (<span data-bind="text: seats().length"></span>)</h2>
+
+<table>
+	<thead>
+		<tr>
+			<th>Passenger name</th>
+			<th>Meal</th>
+			<th>Surcharge</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody data-bind="foreach: seats">
+		<tr>
+			<td>
+				<input data-bind="value: name" />
+			</td>
+			<td>
+				<select data-bind="options: $root.availableMeals, value: meal, optionsText: 'mealName'"></select>
+			</td>
+			<td data-bind="text: formattedPrice"></td>
+			<td><a href="#" data-bind="click: $root.removeSeat">Remove</a></td>
+		</tr>
+	</tbody>
+</table>
+
+<button data-bind="click: addSeat, enable: seats().length < 5">Reserve another seat</button>
+
+<h3 data-bind="visible: totalSurcharge() > 0">
+	Total surcharge: <span data-bind="text: totalSurcharge().toFixed(2)"></span>€
+</h3>
+```
+
+### Viewmodel containing the data
+```javascript
+// Class to represent a row in the seat reservations grid
+function SeatReservation(name, initialMeal) {
+  var self = this;
+  self.name = name;
+  self.meal = ko.observable(initialMeal);
+
+  self.formattedPrice = ko.computed(function() {
+    var price = self.meal().price;
+    return price ? price.toFixed(2) + "€" : "None";
+  });
+}
+
+// Overall viewmodel for this screen, along with initial state
+function ReservationsViewModel() {
+  var self = this;
+
+  // Non-editable catalog data - would come from the server
+  self.availableMeals = [{
+    mealName: "Standard (sandwich)",
+    price: 0
+  }, {
+    mealName: "Premium (lobster)",
+    price: 34.95
+  }, {
+    mealName: "Ultimate (whole zebra)",
+    price: 290
+  }];
+
+  // Editable data
+  self.seats = ko.observableArray([
+    new SeatReservation("Peter", self.availableMeals[0]),
+    new SeatReservation("John", self.availableMeals[0])
+  ]);
+
+  // Computed data
+  self.totalSurcharge = ko.computed(function() {
+    var total = 0;
+    for (var i = 0; i < self.seats().length; i++)
+      total += self.seats()[i].meal().price;
+    return total;
+  });
+
+  // Operations
+  self.addSeat = function() {
+    self.seats.push(new SeatReservation("", self.availableMeals[0]));
+  }
+  self.removeSeat = function(seat) {
+    self.seats.remove(seat)
+  }
+}
+
+ko.applyBindings(new ReservationsViewModel()); // This is where all the magic happens
+```
 
 [Knockout.js]: http://www.knockoutjs.com
 [Node.js]: http://nodejs.org
