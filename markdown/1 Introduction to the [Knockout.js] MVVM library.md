@@ -98,42 +98,41 @@ The third example shows lists and collections for generate repeating blocks of U
 ### View
 
 ```html
-<h2>License overview (<span data-bind="text: users().length"></span>)</h2>
+  <h2>License overview (<span data-bind="text: users().length"></span>)</h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>User name</th>
-      <th>Edition</th>
-      <th>Surcharge</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody data-bind="foreach: users">
-    <tr>
-      <td>
-        <input data-bind="value: name" />
-      </td>
-      <td>
-        <select data-bind="options: $root.availableEditions, value: edition, optionsText: 'editionName'"></select>
-      </td>
-      <td data-bind="text: formattedPrice"></td>
-      <td><a href="#" data-bind="click: $root.removeUser">Remove</a></td>
-    </tr>
-  </tbody>
-</table>
+  <table>
+    <thead>
+      <tr>
+        <th>User name</th>
+        <th>Edition</th>
+        <th>Surcharge</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: users">
+      <tr>
+        <td>
+          <input data-bind="value: name" />
+        </td>
+        <td>
+          <select data-bind="options: $root.availableEditions, value: edition, optionsText: 'editionName'"></select>
+        </td>
+        <td data-bind="text: formattedPrice"></td>
+        <td><a href="#" data-bind="click: $root.removeUser">Remove</a></td>
+      </tr>
+    </tbody>
+  </table>
 
-<button data-bind="click: addUser, enable: users().length < 5">Add user</button>
+  <button data-bind="click: addUser, enable: users().length < 5">Add user</button>
 
-<h3 data-bind="visible: totalSurcharge() > 0">
+  <h3 data-bind="visible: totalSurcharge() > 0">
     Total surcharge: <span data-bind="text: totalSurcharge().toFixed(2)"></span>€
-</h3>
+  </h3>
 ```
 
 ### Viewmodel
 ```javascript
-// Class to represent a row in the user reservations grid
-function UserReservation(name, initialEdition) {
+function UserLicense(name, initialEdition) {
   var self = this;
   self.name = name;
   self.edition = ko.observable(initialEdition);
@@ -144,11 +143,9 @@ function UserReservation(name, initialEdition) {
   });
 }
 
-// Overall viewmodel for this screen, along with initial state
-function ReservationsViewModel() {
+function LicenseViewModel() {
   var self = this;
 
-  // Non-editable catalog data - would come from the server
   self.availableEditions = [{
     editionName: "Standard Edition",
     price: 0
@@ -160,13 +157,11 @@ function ReservationsViewModel() {
     price: 49.95
   }];
 
-  // Editable data
   self.users = ko.observableArray([
-    new UserReservation("Peter", self.availableEditions[0]),
-    new UserReservation("John", self.availableEditions[0])
+    new UserLicense("Peter", self.availableEditions[0]),
+    new UserLicense("John", self.availableEditions[0])
   ]);
 
-  // Computed data
   self.totalSurcharge = ko.computed(function() {
     var total = 0;
     for (var i = 0; i < self.users().length; i++)
@@ -174,318 +169,15 @@ function ReservationsViewModel() {
     return total;
   });
 
-  // Operations
   self.addUser = function() {
-    self.users.push(new UserReservation("", self.availableEditions[0]));
+    self.users.push(new UserLicense("", self.availableEditions[0]));
   }
   self.removeUser = function(user) {
     self.users.remove(user)
   }
 }
 
-ko.applyBindings(new ReservationsViewModel());
-```
-
-##1.5 Single page applications
-
-The fourth example shows a webmail client with hash-based or pushState navigation. Find the snippets (first step) in Codepen.io here: <http://codepen.io/DirtyHerby/pen/bVmzaj>. A standalone finished copy you can find here: <http://learn.knockoutjs.com/WebmailExampleStandalone.html>
-
-### View
-
-```html
-<!DOCTYPE html>
-<html>
-	<head>
-		<script src="path/to/knockout.js"></script>
-		<script src="path/to/sammy.js"></script>
-	</head>
-	<body>
-	
-	<!-- Folders -->
-	  <ul class="folders" data-bind="foreach: folders">
-	    <li data-bind="text: $data, 
-	                   css: { selected: $data == $root.chosenFolderId() },
-	                   click: $root.goToFolder"></li>
-	  </ul>
-	
-	  <!-- Mails grid -->
-	  <table class="mails" data-bind="with: chosenFolderData">
-	    <thead>
-	      <tr>
-	        <th>From</th>
-	        <th>To</th>
-	        <th>Subject</th>
-	        <th>Date</th>
-	      </tr>
-	    </thead>
-	    <tbody data-bind="foreach: mails">
-	      <tr data-bind="click: $root.goToMail">
-	        <td data-bind="text: from"></td>
-	        <td data-bind="text: to"></td>
-	        <td data-bind="text: subject"></td>
-	        <td data-bind="text: date"></td>
-	      </tr>
-	    </tbody>
-	  </table>
-	
-	  <!-- Chosen mail -->
-	  <div class="viewMail" data-bind="with: chosenMailData">
-	    <div class="mailInfo">
-	      <h1 data-bind="text: subject"></h1>
-	      <p>
-	        <label>From</label>: <span data-bind="text: from"></span></p>
-	      <p>
-	        <label>To</label>: <span data-bind="text: to"></span></p>
-	      <p>
-	        <label>Date</label>: <span data-bind="text: date"></span></p>
-	    </div>
-	    <p class="message" data-bind="html: messageContent" />
-	  </div>
-	</body>
-</html>
-```
-
-### Viewmodel
-```javascript
-function WebmailViewModel() {
-  // Data
-  var self = this;
-  self.folders = ['Inbox', 'Archive', 'Sent', 'Spam'];
-  self.chosenFolderId = ko.observable();
-  self.chosenFolderData = ko.observable();
-  self.chosenMailData = ko.observable();
-
-  // Behaviours    
-  self.goToFolder = function(folder) {
-    location.hash = folder
-  };
-  self.goToMail = function(mail) {
-    location.hash = mail.folder + '/' + mail.id
-  };
-
-  // Client-side routes    
-  Sammy(function() {
-    this.get('#:folder', function() {
-      self.chosenFolderId(this.params.folder);
-      self.chosenMailData(null);
-      $.get("/mail", {
-        folder: this.params.folder
-      }, self.chosenFolderData);
-    });
-
-    this.get('#:folder/:mailId', function() {
-      self.chosenFolderId(this.params.folder);
-      self.chosenFolderData(null);
-      $.get("/mail", {
-        mailId: this.params.mailId
-      }, self.chosenMailData);
-    });
-
-    this.get('', function() {
-      this.app.runRoute('get', '#Inbox')
-    });
-  }).run();
-};
-
-ko.applyBindings(new WebmailViewModel());
-```
-
-##1.6 Creating custom bindings
-
-The fifth example shows how to implement a custom widget (poll / rating). Find the snippets (first step) in Codepen.io here: <http://codepen.io/DirtyHerby/pen/zvmeXq>
-
-### View
-
-```html
-<!DOCTYPE html>
-<html>
-	<head>
-		<script src="path/to/jquery.js"></script>
-		<script src="path/to/knockout.js"></script>
-	</head>
-	<body>
-	
-	<h3 data-bind="text: question"></h3>
-	  <p>Please distribute <b data-bind="text: pointsBudget"></b> points between the following options.</p>
-	
-	  <table>
-	    <thead>
-	      <tr>
-	        <th>Option</th>
-	        <th>Importance</th>
-	      </tr>
-	    </thead>
-	    <tbody data-bind="foreach: answers">
-	      <tr>
-	        <td data-bind="text: answerText"></td>
-	        <td>
-	          <select data-bind="options: [1,2,3,4,5], value: points"></select>
-	        </td>
-	      </tr>
-	    </tbody>
-	  </table>
-	
-	  <h3 data-bind="fadeVisible: pointsUsed() > pointsBudget">You've used too many points! Please remove some.</h3>
-	  <p>You've got <b data-bind="text: pointsBudget - pointsUsed()"></b> points left to use.</p>
-	  <button data-bind="jqButton: { enable: pointsUsed() <= pointsBudget }, click: save">Finished</button>
-	</body>
-</html>
-```
-
-### Viewmodel
-```javascript
-// ----------------------------------------------------------------------------
-// Reusable bindings - ideally kept in a separate file
-
-ko.bindingHandlers.fadeVisible = {
-  init: function(element, valueAccessor) {
-    // Start visible/invisible according to initial value
-    var shouldDisplay = valueAccessor();
-    $(element).toggle(shouldDisplay);
-  },
-  update: function(element, valueAccessor) {
-    // On update, fade in/out
-    var shouldDisplay = valueAccessor();
-    shouldDisplay ? $(element).fadeIn() : $(element).fadeOut();
-  }
-};
-
-ko.bindingHandlers.jqButton = {
-  init: function(element) {
-    $(element).button(); // Turns the element into a jQuery UI button
-  },
-  update: function(element, valueAccessor) {
-    var currentValue = valueAccessor();
-    // Here we just update the "disabled" state, but you could update other properties too
-    $(element).button("option", "disabled", currentValue.enable === false);
-  }
-};
-
-// ----------------------------------------------------------------------------
-// Page viewmodel
-
-function Answer(text) {
-  this.answerText = text;
-  this.points = ko.observable(1);
-}
-
-function SurveyViewModel(question, pointsBudget, answers) {
-  this.question = question;
-  this.pointsBudget = pointsBudget;
-  this.answers = $.map(answers, function(text) {
-    return new Answer(text)
-  });
-  this.save = function() {
-    alert('To do')
-  };
-
-  this.pointsUsed = ko.computed(function() {
-    var total = 0;
-    for (var i = 0; i < this.answers.length; i++)
-      total += this.answers[i].points();
-    return total;
-  }, this);
-}
-
-ko.applyBindings(new SurveyViewModel("Which factors affect your technology choices?", 10, [
-  "Functionality, compatibility, pricing - all that boring stuff",
-  "How often it is mentioned on Hacker News",
-  "Number of gradients/dropshadows on project homepage",
-  "Totally believable testimonials on project homepage"
-]));
-```
-
-##1.7 Loading and saving data
-
-The sixth example shows how to load and save date. Find the snippets (first step) in Codepen.io here: <http://codepen.io/DirtyHerby/pen/XmxGXj>
-
-### View
-
-```html
-<!DOCTYPE html>
-<html>
-	<head>
-		<script src="path/to/jquery.js"></script>
-		<script src="path/to/knockout.js"></script>
-	</head>
-	<body>
-	
-	<h3>Tasks</h3>
-
-	  <form data-bind="submit: addTask">
-	    Add task:
-	    <input data-bind="value: newTaskText" placeholder="What needs to be done?" />
-	    <button type="submit">Add</button>
-	  </form>
-	
-	  <ul data-bind="foreach: tasks, visible: tasks().length > 0">
-	    <li>
-	      <input type="checkbox" data-bind="checked: isDone" />
-	      <input data-bind="value: title, disable: isDone" />
-	      <a href="#" data-bind="click: $parent.removeTask">Delete</a>
-	    </li>
-	  </ul>
-	
-	  You have <b data-bind="text: incompleteTasks().length">&nbsp;</b> incomplete task(s)
-	  <span data-bind="visible: incompleteTasks().length == 0"> - it's beer time!</span>
-	
-	  <button data-bind="click: save">Save</button>
-  
-	</body>
-</html>
-```
-
-### Viewmodel
-```javascript
-function Task(data) {
-  this.title = ko.observable(data.title);
-  this.isDone = ko.observable(data.isDone);
-}
-
-function TaskListViewModel() {
-  // Data
-  var self = this;
-  self.tasks = ko.observableArray([]);
-  self.newTaskText = ko.observable();
-  self.incompleteTasks = ko.computed(function() {
-    return ko.utils.arrayFilter(self.tasks(), function(task) {
-      return !task.isDone() && !task._destroy
-    });
-  });
-
-  // Operations
-  self.addTask = function() {
-    self.tasks.push(new Task({
-      title: this.newTaskText()
-    }));
-    self.newTaskText("");
-  };
-  self.removeTask = function(task) {
-    self.tasks.destroy(task)
-  };
-  self.save = function() {
-    $.ajax("/tasks", {
-      data: ko.toJSON({
-        tasks: self.tasks
-      }),
-      type: "post",
-      contentType: "application/json",
-      success: function(result) {
-        alert(result)
-      }
-    });
-  };
-
-  // Load initial state from server, convert it to Task instances, then populate self.tasks
-  $.getJSON("/tasks", function(allData) {
-    var mappedTasks = $.map(allData, function(item) {
-      return new Task(item)
-    });
-    self.tasks(mappedTasks);
-  });
-}
-
-ko.applyBindings(new TaskListViewModel());
+ko.applyBindings(new LicenseViewModel());
 ```
 
 [Knockout.js]: http://www.knockoutjs.com
